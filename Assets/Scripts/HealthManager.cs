@@ -23,16 +23,22 @@ public class HealthManager : MonoBehaviour
 
     private void Start()
     {
-        Player = GameObject.FindObjectOfType<PlayerController>().gameObject;
+        PlayerController[] playerControllers = GameObject.FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+        if (playerControllers.Length > 0)
+        {
+            Player = playerControllers[0].gameObject;
+        }
+        else
+        {
+            Debug.LogError("No PlayerController found in scene!");
+        }
+
         currentHealth = MaxHealth;
         DisplayHearts();
     }
-   
-  
 
     public void HurtPlayer()
     {
-
         if (currentHealth > 0)
         {
             currentHealth--;
@@ -43,8 +49,17 @@ public class HealthManager : MonoBehaviour
         {
             GameManager.instance.Death();
         }
-        
-        Instantiate(damageEffect, Player.transform.position, Quaternion.identity);
+
+        if (Player != null && damageEffect != null)
+        {
+            Instantiate(damageEffect, Player.transform.position, Quaternion.identity);
+        }
+    }
+
+    public void HealPlayer(int healAmount = 2)
+    {
+        currentHealth = Mathf.Min(currentHealth + healAmount, MaxHealth);
+        DisplayHearts();
     }
 
     public void DisplayHearts()
@@ -72,6 +87,24 @@ public class HealthManager : MonoBehaviour
         }
     }
 
-    
+    public void ResetHealth()
+    {
+        currentHealth = MaxHealth;
+        DisplayHearts();
+    }
 
+    public bool IsAtFullHealth()
+    {
+        return currentHealth >= MaxHealth;
+    }
+
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    public int GetMaxHealth()
+    {
+        return MaxHealth;
+    }
 }
