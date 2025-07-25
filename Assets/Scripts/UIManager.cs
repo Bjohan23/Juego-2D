@@ -11,22 +11,36 @@ public class UIManager : MonoBehaviour
     public float fadeSpeed = 2f;
 
     //player reference
-
     public PlayerController playerController;
-
 
     private void Awake()
     {
         instance = this;
     }
 
+    private void Start()
+    {
+        // Find player controller if not assigned
+        if (playerController == null)
+        {
+            playerController = FindFirstObjectByType<PlayerController>();
+        }
+    }
+
     public void DisableMobileControls()
     {
-        mobileControls.SetActive(false);
+        if (mobileControls != null)
+        {
+            mobileControls.SetActive(false);
+        }
     }
+
     public void EnableMobileControls()
     {
-        mobileControls.SetActive(true);
+        if (mobileControls != null)
+        {
+            mobileControls.SetActive(true);
+        }
     }
 
     private void Update()
@@ -62,7 +76,7 @@ public class UIManager : MonoBehaviour
 
         if (blackScreen.color.a <= 0f)
         {
-            if(playerController.controlmode == Controls.mobile)
+            if (playerController != null && playerController.controlmode == Controls.mobile)
             {
                 EnableMobileControls();
             }
@@ -75,5 +89,49 @@ public class UIManager : MonoBehaviour
         Color currentColor = blackScreen.color;
         float newAlpha = Mathf.MoveTowards(currentColor.a, targetAlpha, fadeSpeed * Time.deltaTime);
         blackScreen.color = new Color(currentColor.r, currentColor.g, currentColor.b, newAlpha);
+    }
+
+    // Mobile control methods to be called by UI buttons
+    public void OnMobileJumpPressed()
+    {
+        if (playerController != null)
+        {
+            playerController.MobileJump();
+        }
+    }
+
+    public void OnMobileMovePressed(float direction)
+    {
+        if (playerController != null)
+        {
+            playerController.MobileMove(direction);
+        }
+    }
+
+    public void OnMobileDashPressed()
+    {
+        if (playerController != null)
+        {
+            playerController.MobileDash();
+        }
+    }
+
+    public void OnMobileShootPressed()
+    {
+        if (playerController != null)
+        {
+            playerController.MobileShoot();
+        }
+    }
+
+    // Utility methods
+    public bool IsPlayerControllerValid()
+    {
+        return playerController != null;
+    }
+
+    public void AssignPlayerController(PlayerController controller)
+    {
+        playerController = controller;
     }
 }
